@@ -1,4 +1,4 @@
-"use strict";  // Use strict mode
+"use client"  // Use strict mode
 
 import React, { useContext } from 'react';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import Link from 'next/link';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 
 interface LoginFormValues {
   email: string;
@@ -13,6 +14,8 @@ interface LoginFormValues {
 }
 
 const LoginForm: React.FC = () => {
+
+  const { login, error } = useAuth();
 
   const initialValues: LoginFormValues = {
     email: '',
@@ -28,8 +31,11 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = async (values: LoginFormValues, actions: FormikHelpers<LoginFormValues>) => {
     try {
-      const response = await axios.post('/api/login', values);
-        
+      await login(values.email, values.password);
+
+      // if (!error) {
+      //   push('/'); 
+      // }
     } catch (error) {
       console.error('An error occurred:', error);
       actions.setSubmitting(false);
@@ -73,6 +79,7 @@ const LoginForm: React.FC = () => {
         >
           Log In
         </button>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
         <div className='flex justify-center items-center py-3'>
           <p className='px-2 text-slate-500'>Dont have an account?</p>
           <Link href="/signup" className='px-0.5 text-md text-slate-800 hover:underline'>
