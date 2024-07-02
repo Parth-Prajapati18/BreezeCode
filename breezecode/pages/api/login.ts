@@ -7,8 +7,11 @@ const prisma = new PrismaClient();
 
 interface LoginResponse {
     user: {
+        name: string | null;
         email: string;
         role: string;
+        accessToken: string;
+        refreshToken: string;
     };
 }
 
@@ -49,11 +52,6 @@ export default async function handler(
                 { expiresIn: '7d' }
             );
 
-            res.setHeader('Set-Cookie', [
-                `accessToken=${accessToken}; HttpOnly; Path=/; Max-Age=${15 * 60}; Secure; SameSite=Strict`,
-                `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=${7 * 24 * 60 * 60}; Secure; SameSite=Strict`
-              ]);
-
             await prisma.user.update({
                 where: { id: user.id },
                 data: { refreshToken },
@@ -61,8 +59,11 @@ export default async function handler(
 
             res.status(200).json({
                 user: {
+                    name: user.firstName,
                     email: user.email,
                     role: user.role,
+                    accessToken,
+                    refreshToken,
                 },
             });
 
