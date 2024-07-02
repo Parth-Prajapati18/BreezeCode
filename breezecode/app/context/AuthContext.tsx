@@ -1,9 +1,10 @@
 "use client"
+import { useRouter } from 'next/navigation';
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import cookie from 'js-cookie';
 
 interface AuthContextType {
-  accessToken: string | null;
-  refreshToken: string | null;
+  isAuthenticated: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   refreshAccessToken: () => Promise<void>;
@@ -14,11 +15,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
-    const [ accessToken, setAccessToken] = useState<string | null>(null);
-
-    const [refreshToken, setRefreshToken] = useState<string | null>(null);
-
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+      const accessToken = cookie.get('accessToken');
+      if (accessToken) {
+        setIsAuthenticated(true);
+      }
+      const interval = setInterval(refreshAccessToken, 14*60*1000);
+      return () => clearInterval(interval);
+    }, []);
 
     const login = async (email: string, password: string) => {
         try {
@@ -32,19 +40,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setError(errorData.message);
             return;
           }
-          const data = await response.json();
-          setAccessToken(data.accessToken);
-          setRefreshToken(data.refreshToken);
-          setError(null); 
+          setIsAuthenticated(true);
+          setError(null);
+          router.push('/'); 
         } catch (error) {
           setError('An unexpected error occurred');
         }
       };
 
     const logout = () => {
-        setAccessToken(null);
-        setRefreshToken(null);
-        setError(null);
+      cookie.remove('accessToken');
+      cookie.remove('refreshToken');
+      setIsAuthenticated(false);
+      setError(null);
+      router.push('/login');
     };
 
     const refreshAccessToken = async () => {
@@ -52,21 +61,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const response = await fetch('/api/refresh-token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refreshToken }),
           });
+
           if (!response.ok) {
             logout();
             return;
           }
-          const data = await response.json();
-          setAccessToken(data.accessToken);
         } catch (error) {
           logout();
         }
       };
 
     return(
-        <AuthContext.Provider value={{ accessToken, refreshToken, login, logout, refreshAccessToken, error }}  >
+        <AuthContext.Provider value={{ isAuthenticated, login, logout, refreshAccessToken, error }}  >
             {children}
         </AuthContext.Provider>
     );

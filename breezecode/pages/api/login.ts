@@ -6,8 +6,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 const prisma = new PrismaClient();
 
 interface LoginResponse {
-    accessToken: string;
-    refreshToken: string;
     user: {
         email: string;
         role: string;
@@ -42,7 +40,7 @@ export default async function handler(
             const accessToken = jwt.sign(
                 { userId: user.id, role: user.role },
                 process.env.JWT_ACCESS_SECRET!,
-                { expiresIn: '4h' }
+                { expiresIn: '15m' }
             );
 
             const refreshToken = jwt.sign(
@@ -51,18 +49,23 @@ export default async function handler(
                 { expiresIn: '7d' }
             );
 
+            res.setHeader('Set-Cookie', [
+                `accessToken=${accessToken}; HttpOnly; Path=/; Max-Age=${15 * 60}; Secure; SameSite=Strict`,
+                `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=${7 * 24 * 60 * 60}; Secure; SameSite=Strict`
+              ]);
+
             await prisma.user.update({
                 where: { id: user.id },
                 data: { refreshToken },
             });
+
             res.status(200).json({
-                accessToken,
-                refreshToken,
                 user: {
                     email: user.email,
                     role: user.role,
                 },
             });
+
         } catch (error) {
             res.status(500).json({ message: 'Something went wrong' });
         }

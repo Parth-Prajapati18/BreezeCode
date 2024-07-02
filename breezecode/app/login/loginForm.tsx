@@ -1,12 +1,11 @@
-"use client"  // Use strict mode
+"use client" 
 
-import React, { useContext } from 'react';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import Link from 'next/link';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useEffect } from 'react';
 
 interface LoginFormValues {
   email: string;
@@ -15,14 +14,19 @@ interface LoginFormValues {
 
 const LoginForm: React.FC = () => {
 
-  const { login, error } = useAuth();
+  const { login, isAuthenticated, error } = useAuth();
+  const router = useRouter();
+
+  useEffect(()=>{
+    if(isAuthenticated){
+      router.push('/');
+    }
+  }, [])
 
   const initialValues: LoginFormValues = {
     email: '',
     password: '',
   };
-
-  const { push } = useRouter();
 
   const validationSchema = Yup.object({
     email: Yup.string().email('Invalid email address').required('Required'),
@@ -30,16 +34,8 @@ const LoginForm: React.FC = () => {
   });
 
   const handleSubmit = async (values: LoginFormValues, actions: FormikHelpers<LoginFormValues>) => {
-    try {
-      await login(values.email, values.password);
-
-      // if (!error) {
-      //   push('/'); 
-      // }
-    } catch (error) {
-      console.error('An error occurred:', error);
-      actions.setSubmitting(false);
-    }
+    await login(values.email, values.password);
+    actions.setSubmitting(false);
   };
 
   return (

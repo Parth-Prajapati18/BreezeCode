@@ -17,7 +17,7 @@ export default async function handler(
   res: NextApiResponse<TokenResponse | ErrorResponse>
 ) {
   if (req.method === 'POST') {
-    const { refreshToken } = req.body;
+    const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
       return res.status(400).json({ message: 'Refresh Token is required' });
@@ -42,6 +42,10 @@ export default async function handler(
         process.env.JWT_ACCESS_SECRET!,
         { expiresIn: '15m' }
       );
+
+    res.setHeader('Set-Cookie', [
+      `accessToken=${newAccessToken}; HttpOnly; Path=/; Max-Age=${15 * 60}; Secure; SameSite=Strict`
+    ]);
 
       res.status(200).json({
         accessToken: newAccessToken,
