@@ -15,7 +15,9 @@ const config: Config = {
       },
       colors: {
         MC1: '#f5c4c4',
-        MC2: '#FFF0E5'
+        MC2: '#FFF0E5',
+        VSB: '#1e1e1e',
+        VSB2: '#3c3c3c',
       }
     },
   },

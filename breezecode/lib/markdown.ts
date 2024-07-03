@@ -1,0 +1,26 @@
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
+import { remark } from 'remark';
+import html from 'remark-html';
+
+export async function getCourseContent(slug: string) {
+
+    const courseDir = path.join(process.cwd(), 'content', slug);
+    const files = fs.readdirSync(courseDir);
+
+    const chapters = await Promise.all(files.map(async (file) => {
+
+        const filePath = path.join(courseDir, file);
+        const fileContents = fs.readFileSync(filePath, 'utf-8');
+        const { data, content } = matter(fileContents);
+
+        const processedContent = await remark().use(html).process(content);
+        const contentHtml = processedContent.toString();
+
+        return {...data, contentHtml};
+    }));
+
+    return chapters;
+
+}
