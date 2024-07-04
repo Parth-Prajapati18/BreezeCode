@@ -24,13 +24,15 @@ export default function JsTerminal() {
 
   return (
     <div className="bg-VSB2">
+    <div style={{height: '80vh'}}>
     <Editor
-      height="85vh"
+      height="100%"
       defaultLanguage="javascript"
       defaultValue="// Write your code here"
       onChange={(value) => handleCodeChange(value)}
       theme="vs-dark"
     />
+    </div>
     <button onClick={executeCode} className="m-4 py-1 px-4 bg-yellow-400 font-semibold border rounded-md">Run</button>
   </div>
   )
