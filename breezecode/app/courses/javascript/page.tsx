@@ -1,21 +1,30 @@
+"use client"
+import CodeEditorWindow from '@/app/components/CodeEditorWindow';
 import { Metadata } from 'next';
-import JsTerminal from '@/app/components/terminals/jsTerminal';
-import ChapterDetails from '../chapterDetails';
 
-export const metadata: Metadata = {
-  title: 'JavaScript Course',
-};
+const JavaScriptPage: React.FC = () => {
 
-const JavaScriptPage: React.FC = async () => {
+  const onChange = (action: string, data: string) => {
+    switch (action) {
+      case "code": {
+        break;
+      }
+      default: {
+        console.warn("case not handled!", action, data);
+      }
+    }
+  };
 
   return (
-    <div className='bg-green-500' style={{ height: `calc(100vh - 4rem)` }}>
-      <div className='bg-yellow-500 h-full'>
+    <div className='top-16 bottom-0 grid grid-cols-5'>
 
+      <div  className='col-span-2'>Col1</div>
+      <div className='col-span-2'>
+        <CodeEditorWindow onChange={onChange}  />
       </div>
-      <div className='h-16 bg-red-400 bottom-0 fixed'>
-        Footer
-      </div>
+      <div className=''>Col3</div>
+      
+      
     </div>
   );
 };
