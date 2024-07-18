@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Editor from '@monaco-editor/react';
 
 interface CodeEditorWindowProps {
-    onChange: (field: string, value: string) => void;
+    onChange: (newCode: string) => void;
     language?: string;
     code?: string;
     defaultCode?: string;
@@ -15,7 +15,7 @@ const CodeEditorWindow: React.FC<CodeEditorWindowProps> = ({ onChange, language,
     const handleEditorChange = (value: string | undefined) => {
         const updatedValue = value || '';
         setValue(updatedValue);
-        onChange('code', updatedValue);
+        onChange(updatedValue);
     };
 
     return (
