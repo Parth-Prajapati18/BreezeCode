@@ -138,26 +138,6 @@ const NavBarLoggedIn: React.FC<any> = ({ logout }) => {
                                                         </a>
                                                     )}
                                                 </MenuItem>
-                                                <MenuItem>
-                                                    {({ active }) => (
-                                                        <a
-                                                            href="/courses/data-science"
-                                                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                                                        >
-                                                            Data Science
-                                                        </a>
-                                                    )}
-                                                </MenuItem>
-                                                <MenuItem>
-                                                    {({ active }) => (
-                                                        <a
-                                                            href="/courses/design"
-                                                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                                                        >
-                                                            Design
-                                                        </a>
-                                                    )}
-                                                </MenuItem>
                                             </MenuItems>
                                         </Transition>
                                     </Menu>
