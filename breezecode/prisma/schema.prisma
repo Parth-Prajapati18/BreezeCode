@@ -31,3 +31,21 @@ model User {
   updatedAt      DateTime @updatedAt
 
 }
+
+model Course {
+  id          Int       @id
+  title       String
+  description String?
+  chapters    Chapter[]
+}
+
+model Chapter {
+  id       Int    @id @default(autoincrement())
+  courseId Int
+  title    String
+  content  String?
+  sampleCode String?
+  course   Course @relation(fields: [courseId], references: [id])
+
+  @@index([courseId])
+}
